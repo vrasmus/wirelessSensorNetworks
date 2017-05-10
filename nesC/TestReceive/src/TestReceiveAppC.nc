@@ -37,22 +37,19 @@
  * @author tinyos-help@millennium.berkeley.edu
  **/
 
-configuration BlinkAppC
+configuration TestReceiveAppC
 {
 }
 implementation
 {
-  components MainC, BlinkC, LedsC;
+  components MainC, TestReceiveC, LedsC;
   components new TimerMilliC() as Timer0;
-//  components new TimerMilliC() as Timer1;
-//  components new TimerMilliC() as Timer2;
 
+  TestReceiveC -> MainC.Boot;
 
-  BlinkC -> MainC.Boot;
-
-  BlinkC.Timer0 -> Timer0;
-//  BlinkC.Timer1 -> Timer1;
-//  BlinkC.Timer2 -> Timer2;
-  BlinkC.Leds -> LedsC;
+  TestReceiveC.Timer0 -> Timer0;
+  TestReceiveC.Leds -> LedsC;
+  
+  TestReceiveC.Receive -> AMReceiverC;
 }
 
