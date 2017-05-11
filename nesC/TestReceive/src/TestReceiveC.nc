@@ -1,76 +1,97 @@
-// $Id: BlinkC.nc,v 1.5 2008/06/26 03:38:26 regehr Exp $
-
-/*									tab:4
- * "Copyright (c) 2000-2005 The Regents of the University  of California.  
- * All rights reserved.
- *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
- * 
- * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF
- * CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS."
- *
- * Copyright (c) 2002-2003 Intel Corporation
- * All rights reserved.
- *
- * This file is distributed under the terms in the attached INTEL-LICENSE     
- * file. If you do not find these files, copies can be found by writing to
- * Intel Research Berkeley, 2150 Shattuck Avenue, Suite 1300, Berkeley, CA, 
- * 94704.  Attention:  Intel License Inquiry.
- */
-
-/**
- * Implementation for Blink application.  Toggle the red LED when a
- * Timer fires.
- **/
-
 #include "Timer.h"
+#include "TestReceive.h"
 
 module TestReceiveC @safe()
 {
   uses interface Timer<TMilli> as Timer0;
-//  uses interface Timer<TMilli> as Timer1;
-//  uses interface Timer<TMilli> as Timer2;
   uses interface Leds;
   uses interface Boot;
+  
+  uses interface SplitControl as AMControl;
+  uses interface Receive;
+  
+  uses interface SplitControl as SControl;
+  uses interface AMSend;
+  uses interface Packet;
 }
 implementation
 {
-  event void Boot.booted()
-  {
-    call Timer0.startPeriodic( 500 );
-//    call Timer1.startPeriodic( 500 );
-//    call Timer2.startPeriodic( 1000 );
-  }
-//
+	uint32_t PRRCount;
+	uint8_t PLen;
+	bool locked = FALSE;
+	
+	event void Boot.booted(){
+		PRRCount = 0;
+		PLen = 255;
+		call AMControl.start();
+		call SControl.start();
+	}
+	
+	event void AMControl.startDone(error_t err) {
+		if (err == SUCCESS) {
+			//call Timer0.startPeriodic(TIMER_PERIOD_MILLI);	
+		} else {
+			call AMControl.start();
+		}
+	}
+	
+	
+	event void AMControl.stopDone(error_t err){
+		}
+	
+	
+	event void SControl.startDone(error_t err) {
+		if (err == SUCCESS) {
+			//call Timer0.startOneShot(2000);
+			call Timer0.startPeriodic(SERIAL_PERIOD_MILLI);
+		} else {
+			call SControl.start();
+		}
+	}
+	
+	event void SControl.stopDone(error_t err){
+		}
+
   event void Timer0.fired()
   {
     dbg("BlinkC", "Timer 0 fired @ %s.\n", sim_time_string());
 //  call Leds.led0Toggle();
+//  call Leds.led1Toggle();
   call Leds.led1Toggle();
-//  call Leds.led2Toggle();
+  
+      if (locked) {
+      return;
+    }
+    else {
+//		serialMsg sendMe = (serialMsg){PRRCount};
+		message_t sendMe;
+		serialMsg * countMsg = (serialMsg *)call Packet.getPayload(&sendMe, sizeof(serialMsg));
+		countMsg->count = PRRCount;
+		countMsg->payloadLen = PLen;
+		if (call AMSend.send(AM_BROADCAST_ADDR, &sendMe, sizeof(serialMsg)) == SUCCESS) {
+		    locked = TRUE;
+		}
+     }
   }
-//  
-//  event void Timer1.fired()
-//  {
-//    dbg("BlinkC", "Timer 1 fired @ %s \n", sim_time_string());
-//    call Leds.led1Toggle();
-//  }
-//  
-//  event void Timer2.fired()
-//  {
-//    dbg("BlinkC", "Timer 2 fired @ %s.\n", sim_time_string());
-//    call Leds.led2Toggle();
-//  }
+
+	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
+  //if (len == sizeof(TestMsg)) {
+    TestMsg* btrpkt = (TestMsg*)payload;
+    if(btrpkt->nodeid==13){//magic number set on transmitter.
+    	call Leds.led0Toggle();
+//    	PLen = call Packet.payloadLength(msg);
+    	PLen = len;
+    	PRRCount++;
+    //}
+  }
+  return msg;
 }
+
+  event void AMSend.sendDone(message_t* bufPtr, error_t error) {
+    locked = FALSE;
+  }
+
+
+}
+
 
