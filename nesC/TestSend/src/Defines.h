@@ -2,6 +2,8 @@
 #define DEFINES_H
 
 #define TOSH_DATA_LENGTH 103
+#define CC2420_DEF_RFPOWER 3
+
 
 enum {
 	AM_BLINKTORADIO = 6,
