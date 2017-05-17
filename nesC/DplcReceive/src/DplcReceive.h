@@ -22,8 +22,9 @@ typedef nx_struct serialMsg {
   nx_uint8_t payloadLen;
 } serialMsg;
 
-typedef nx_struct feedbackMsg {
-  nx_uint16_t count;
-} feedbackMsg;
+//typedef nx_struct feedbackMsg {
+//  nx_uint16_t nodeid;
+//  nx_uint16_t count;
+//} feedbackMsg;
 
 #endif /* TEST_RECEIVE_H */

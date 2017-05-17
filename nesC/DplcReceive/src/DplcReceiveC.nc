@@ -9,6 +9,7 @@ module DplcReceiveC @safe()
  
 	uses interface SplitControl as AMControl;
 	uses interface Receive;
+	uses interface AMSend as SendW;
  
 	uses interface SplitControl as SControl;
 	uses interface AMSend;
@@ -16,9 +17,11 @@ module DplcReceiveC @safe()
 }
 implementation
 {
-	uint32_t PRRCount;
+	uint8_t PRRCount;
 	uint8_t PLen;
 	bool locked = FALSE;
+	bool lockedW = FALSE;
+	message_t countMsg1;
 	
 	event void Boot.booted(){
 		PRRCount = 0;
@@ -84,28 +87,30 @@ implementation
 			PRRCount++;
 			//}
 		} else if(btrpkt->nodeid==42){//PRR Count Request id
-			if (locked) {
-				return;
+			if (lockedW) {
+				return msg;
 			}
 			else {
-				message_t countMsg;
-				feedbackMsg * countReqMsg = (feedbackMsg *)call Packet.getPayload(&countMsg, sizeof(feedbackMsg));
-				countReqMsg->count = PRRCount;
-				if (call AMSend.send(AM_BROADCAST_ADDR, &countMsg, sizeof(feedbackMsg)) == SUCCESS) {
-					locked = TRUE;
-					PRRCount = 0;
-					call Leds.led2Toggle();
+				TestMsg * countReqMsg = (TestMsg *)call Packet.getPayload(&countMsg1, sizeof(TestMsg));
+				countReqMsg->nodeid = 42;
+				countReqMsg->counter = PRRCount;
+				if (call SendW.send(AM_BROADCAST_ADDR, &countMsg1, sizeof(TestMsg)) == SUCCESS) {
+					lockedW = TRUE;
+					PRRCount = 0;					
 				}
 			}
 		}
 		return msg;
 	}
 
+	event void SendW.sendDone(message_t* bufPtr, error_t error) {
+		lockedW = FALSE;
+		call Leds.led2Toggle();
+	}
+
 	event void AMSend.sendDone(message_t* bufPtr, error_t error) {
 		locked = FALSE;
 	}
-
-
 }
 
 

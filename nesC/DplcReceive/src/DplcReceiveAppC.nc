@@ -9,6 +9,7 @@ implementation
   components new TimerMilliC() as Timer0;
   components ActiveMessageC;
   components new AMReceiverC(AM_BLINKTORADIO);  
+  components new AMSenderC(AM_BLINKTORADIO); 
   
   components SerialActiveMessageC as Serial;
   
@@ -20,7 +21,7 @@ implementation
   
   DplcReceiveC.AMControl -> ActiveMessageC;
   DplcReceiveC.Receive -> AMReceiverC;
-  DplcReceiveC.AMSend -> ActiveMessageC.AMSend[AM_FEEDBACK_MSG];
+  DplcReceiveC.SendW -> AMSenderC;
   
     
   DplcReceiveC.SControl -> Serial;
