@@ -10,7 +10,8 @@ enum {
 	PAYL_ENV_ID = 13,
 	REQ_ENV_ID = 42,
 	DATA_LENGTH = 100,
-	INTER_MESSAGE_DELAY = 400
+	INTER_MESSAGE_DELAY = 50,
+	PACKAGE_COUNT_REQUEST = 100
 };
  
 typedef nx_struct TestMsg {
