@@ -9,7 +9,7 @@ enum{
 	AM_BLINKTORADIO = 6,
 	AM_TEST_SERIAL_MSG = 0x89,
 	AM_FEEDBACK_MSG = 0x42,
-	SERIAL_PERIOD_MILLI = 5000,
+	SERIAL_PERIOD_MILLI = 2000,
 };
 
 typedef nx_struct TestMsg {

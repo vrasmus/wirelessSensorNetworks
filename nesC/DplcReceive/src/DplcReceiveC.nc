@@ -21,6 +21,7 @@ implementation
 	uint8_t PLen;
 	bool locked = FALSE;
 	bool lockedW = FALSE;
+	bool last42 = FALSE;
 	message_t countMsg1;
 	
 	event void Boot.booted(){
@@ -82,11 +83,16 @@ implementation
 		TestMsg* btrpkt = (TestMsg*)payload;
 		if(btrpkt->nodeid==13){//magic number set on transmitter.
 			call Leds.led0Toggle();
+			if(last42 == TRUE){
+				PRRCount = 0;	
+			}
+			last42 = FALSE;
 			//    	PLen = call Packet.payloadLength(msg);
 			PLen = len;
 			PRRCount++;
 			//}
 		} else if(btrpkt->nodeid==42){//PRR Count Request id
+			last42 = TRUE;
 			if (lockedW) {
 				return msg;
 			}
@@ -95,8 +101,7 @@ implementation
 				countReqMsg->nodeid = 42;
 				countReqMsg->counter = PRRCount;
 				if (call SendW.send(AM_BROADCAST_ADDR, &countMsg1, sizeof(TestMsg)) == SUCCESS) {
-					lockedW = TRUE;
-					PRRCount = 0;					
+					lockedW = TRUE;	
 				}
 			}
 		}
