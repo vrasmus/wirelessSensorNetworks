@@ -14,18 +14,27 @@
 \usepackage{amsmath}	
 \usepackage{todonotes}
 \usepackage{verbatimbox}
-\renewcommand{\baselinestretch}{1.1}
+\renewcommand{\baselinestretch}{1.25}
 
-\title{Wireless Sensor Networks}
-\author{Group 42}
-\date{May 2017}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,calc}
 
+\title{Dynamic Packet Length Control in Wireless Sensor Networks\vspace{-0.3cm}}
+\author{\footnotesize  Group 42, Wireless Sensor Networks and Electronics Miniproject, June 2017\\
+\footnotesize Rasmus Vestergaard, Daniel Pytlos,
+Esteban Javier Struve Taguaruco,
+Brynleif Andreasen and Stefan Bejan\\
+\footnotesize Aarhus University, Department of Engineering}
+\date{}
 \begin{document}		
 \maketitle
 
-\begin{figure}
-\centering
-\includegraphics[scale=1]{figs/testFig.pdf} 
-\caption{Measurements at $35$ m, power $7$.}
-\end{figure}
+\input{sections/intro}
+\input{sections/channelEstimation}
+\input{sections/DPLC}
+\input{sections/conclusion}
+
+\nocite{*}
+\bibliography{refs}
+\bibliographystyle{ieeetr}
 \end{document}

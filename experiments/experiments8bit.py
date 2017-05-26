@@ -29,29 +29,6 @@ with open(dataFile, 'r') as f:
 --------------------------------------------------------------------------
 """
    
-#data = data[:-1]
-#data = data.split('\n')
-#data = [i.strip() for i in data]
-#data = [i.split(' ') for i in data]
-#data = [[int(i,16) for i in j] for j in data] #Convert all to ints
-#data = np.array(data)
-#data = data[:,8:] # Remove header, so only useful information left
-#
-#dataInd = np.where(np.diff(data[:,2],1)==-10)[0]
-#dataInd = [i for i in dataInd if i>np.where(np.diff(data[:,2],1)==-155)[0][0]]
-#dataInd = np.append(dataInd,np.shape(data)[0]-1)
-#
-#diffData = np.diff(data[:,1])
-#overflowInd = np.where(np.diff(data[:,1]) <0)
-#diffData[overflowInd] += 255
-#data[1:,1] = np.cumsum(diffData)
-#dataPoints = data[dataInd]
-#
-#dataPoints = np.delete(dataPoints,0,axis=1)
-#dataPoints[1:,0] = np.diff(dataPoints,axis=0)[:,0]
-#dataPoints = np.fliplr(np.flipud(dataPoints)) #now col0 is packet len, col1 is packets received
-#dataPoints = dataPoints.astype(np.float64)
-
 files = ['45mTest1.txt', '45mTest2.txt','45mTest3.txt']
 fig, ax1 = plt.subplots()
 ax2 = ax1.twinx()
