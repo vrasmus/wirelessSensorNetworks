@@ -26,6 +26,8 @@ implementation
 	
 	uint8_t waitingForAck = 0;
 	
+	uint8_t consecutiveStable = 0;
+	
 	event void Boot.booted()
 	{
 		call AMControl.start();
@@ -87,17 +89,32 @@ implementation
 	
 			uint8_t count  =  btrpkt->counter[0];
 	
-			float efficiency = (plen*(count/PACKAGE_COUNT_REQUEST))/(plen + 11);
+			float efficiency = (plen*((float)count/PACKAGE_COUNT_REQUEST))/(plen + 11);
 	
 			float direction = (efficiency - e_old)*(plen-plen_old);
 	
 			plen_old = plen;
 			e_old = efficiency;
-			if(direction < 0.01 && plen != 100){
+			if(direction > 0.1 && plen != 100){
 				plen = plen + 10;
 			}
-			else if (direction < -0.01 && plen != 10){
+			else if (direction < -0.1 && plen != 10){
 				plen = plen - 10;
+			}
+			else if (direction == 0 && consecutiveStable != 3){
+				consecutiveStable++;				
+				}
+			else if (direction == 0 && consecutiveStable == 3)
+			{
+				consecutiveStable = 0;
+				if (plen == 100)
+				{
+					plen = plen - 10;
+				}
+				else
+				{
+					plen = plen + 10;	
+				}
 			}
 			
 			waitingForAck = 0;
