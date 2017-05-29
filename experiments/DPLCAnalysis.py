@@ -18,9 +18,9 @@ rcParams['xtick.labelsize'] = 8
 rcParams['ytick.labelsize'] = 8
 rcParams['font.size'] = 7
 
-dataFile = 'DPLC35m.txt'
+#dataFile = 'DPLC35m.txt'
 #dataFile = 'DPLC39m.txt'
-#dataFile = 'DPLC_45.txt'
+dataFile = 'DPLC_45.txt'
 
 
 with open(dataFile, 'r') as f:

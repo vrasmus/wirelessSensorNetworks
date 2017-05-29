@@ -1,27 +1,34 @@
-\section{Dynamic Packet Length Control}
-
+\section{Dynamic Packet Length Control Scheme\label{sec:DPLC}}
+It is now established that the payload length chosen has a significant influence on the resulting transmission efficiency. This section describes a simple scheme that allows a mote to dynamically adjust the payload size and continously maximize the transmission efficiency based on current channel conditions. Define the parameters at time instance $i$: 
 \begin{equation}
-d = \Delta \mathcal{E}\cdot\Delta l= (\mathcal{E}_i - \mathcal{E}_{i-1})(l_i - l_{i-1})
+(\mathcal{E}_i , l_i) \coloneqq (\mathcal{E}(l_i) , l_i).
 \end{equation}
+At a given time $k-1$, the sequence of previous parameters can be used to estimate what the payload length should be at time $k$:
+\begin{equation}
+l_k = f\left(
+(\mathcal{E}_i , l_i )_{i=0}^{k-1}
+\right),
+\end{equation}
+where $f(\cdot)$ is a function to calculate the new payload length based on the previous ones. In reality, all previous parameters cannot be used for multiple reasons: First, the wireless channel is known to be time-varying and a given relationship between packet length and transmission efficiency cannot be expected to be similar to what was observed earlier, if a long period of time has passed. Second, the sensor motes usually have severely constrained storage, and storing all old information could take up a large chunk of the available memory. Therefore, a scheme using only the previous parameters is designed. Assuming that the channel estimation is done relatively frequently, it is expected that there will be a high correlation between subsequent timeslots. The channel estimation is done in a similar manner as described in section \ref{sec:chanEst}. The transmitting mote records the number of packets it has sent, and periodically asks the receiving mote how many packets it has received. In this way, the packet reception rate is estimated and used by the receiving mote to calculate the channel efficiency at time $i$, $\mathcal{E}_i$. Two gradient variables are defined, calculated from the current and previous parameters:
+\begin{align}
+\Delta \mathcal{E} &\coloneqq (\mathcal{E}_i - \mathcal{E}_{i-1}),\\
+\Delta l &\coloneqq (l_i - l_{i-1}).
+\end{align}
+These first gradient variable, $\Delta \mathcal{E}$, captures the change in transmission efficiency introduced by adjusting the payload length from $l_{i-1}$ to $l_{i}$: If $\Delta \mathcal{E} > 0$ the change improved the efficiency, whereas a $\Delta \mathcal{E} < 0$ indicates a decline. The other variable captures what the last change in payload length was: If $\Delta l > 0$ the payload length was increased last, and $\Delta l < 0$ shows that the payload length was decreased last. Based on these two parameters a direction variable, $d$ is calculated, and used for determining what change to make to the payload length:
+\begin{equation}
+d = \Delta \mathcal{E}\cdot\Delta l,\label{eq:d}
+\end{equation}
+where it is clear that there are four distinct options:
+\begin{itemize}  
+\setlength{\itemsep}{1pt}
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+\item[ ] $\Delta l < 0 \wedge \Delta \mathcal{E} < 0 \Rightarrow d > 0$\quad \textit{(Worse efficiency from smaller payload)},
+\item[ ] $\Delta l < 0 \wedge \Delta \mathcal{E} > 0 \Rightarrow d < 0$\quad \textit{(Better efficiency from smaller payload)},
+\item[ ] $\Delta l > 0 \wedge \Delta \mathcal{E} < 0 \Rightarrow d < 0$\quad \textit{(Worse efficiency from larger payload)},
+\item[ ] $\Delta l > 0 \wedge \Delta \mathcal{E} > 0 \Rightarrow d > 0$\quad \textit{(Better efficiency from larger payload)}.
+\end{itemize}
+The next payload length is chosen based on the resulting value of $d$. If $d$ is positive, the payload length should be increased, whereas a negative value for $d$ means that the payload length should be decreased. In order to allow the scheme to reach a steady state, it is determined that a threshold $\pm D$ should be exceeded for a change to be made in the channel, i.e. $|d| > D$. Further, only changes of $\pm 10$ bytes are allowed to the payload length, in order to make changes that are large enough to be significant, yet small enough for the efficiency to be correlated to the previous estimate. Figure \ref{fig:d} summarizes what the effect of a given value of $d$ is on the payload length. 
+A special case arises when the parameter $d$ falls between the thresholds, i.e. $|d| < D$. In this case, there is no change to the packet length. The effect of this is that in the next timestep $\Delta l= 0$, thus causing $d = 0$ according to equation (\ref{eq:d}). This causes a steady state, where the payload length will not change anymore. As the channel conditions could easily change after a steady state has been reached, it is determined that after a certain number of time steps with no change in the payload length, a change is forced to cause the scheme to search for a new optimum.
+The change is forced as $l_i = l_{i-1} + 10$, an addition of ten bytes to the payload length, unless the payload length is already at the maximum allowed for the scheme, where the change will be $l_i = l_{i-1} -10$, a subtraction of ten bytes instead. The reason for automatically forcing an increase rather than a decrease is to be greedy: If the payload length is bigger the overhead from the header is smaller, thus it is desirable to immedeately increase the payload length if the channel conditions has become better that it was when the steady state was reached. If the channel conditions instead became worse, the scheme would adapt to this, and reduce the payload length at the next time step. 
 \input{figs/dirFig}
-
-\begin{figure}
-\centering
-\includegraphics[scale=1]{figs/35mDPLC.pdf} 
-\caption{Add Caption}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[scale=1]{figs/35mHist.pdf} 
-\caption{Add Caption}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[scale=1]{figs/45mDPLC.pdf} 
-\caption{Add Caption}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[scale=1]{figs/45mHist.pdf} 
-\caption{Add Caption}
-\end{figure}

@@ -5,7 +5,7 @@ The paper is organized as follows \todo{write this + main contributions}.
 \section{Packet Size Influence}
 In order to understand the effects of adjusting the packet length, an analytical result is presented. First, the transmission efficiency $\mathcal{E}$, which is the amount of useful information bits received per transmitted bit, is:
 \begin{equation}
-\mathcal{E} = \frac{l\cdot \text{p}(l)}{l + H + O},\label{E}
+\mathcal{E}(l) = \frac{l\cdot \text{p}(l)}{l + H + O},\label{E}
 \end{equation}
 where $l$ is the payload length, $p(l)$ is the packet reception rate (PRR) when packets have length $l$, $H$ is overhead from the header and $O$ is additional overhead introduced by the optimization scheme. Since the scheme is not yet considered, let $O=0$ for now. Under the assumption that the channel is a Binary Symmetric Channel (BSC), the analytical value of $\mathcal{E}$ can be found. Assuming that the receiver is able to correctly detect whenever the message is incorrectly received, and has no correction capability, a packet will be passed to the higher layers only when no changes to it were introduced by the channel. The packet reception rate is then:
 \begin{equation}
