@@ -1,23 +1,24 @@
-\section{Estimating the Channel\label{sec:chanEst}}
+\section{Estimating the Channel
+\label{sec:chanEst}}
 
-The first experiment performed had the purpose of estimating the channel properties in different conditions. For this experiment, no dynamic packet length control scheme was used. Instead, simple, out-of-the-box packet transmission  with different packet lengths, with a fixed number of packets with each. Based on the number of received packages, the PRR $p(l)$ and efficiency $\mathcal{E}$ have been estimated.
+The first experiment performed had the purpose of estimating the channel properties in different conditions. For this experiment, no dynamic packet length control scheme was used. Instead, simple, out-of-the box packet transmission  with different packet lengths has been used. Based on the number of received packages, the PRR $p(l)$ and efficiency $\mathcal{E}$ have been estimated.
 
-\paragraph{Transmitter} The transmitter sends a fixed number of packets to the receiver. The length of the packets decreases gradually in steps of $10$ bytes. In this implementation the transmitter sends $1000$ packages periodically, every 50 milliseconds, starting with the maximum $l = 100$. After the first batch of messages has been sent, the transmitter waits $5$ seconds before sending the next batch of (smaller) packets.
+\paragraph{Transmitter} The transmitter sends a fixed number of packets to the receiver. The length of the packets decreases gradually in steps of $10$ bytes. In our implementation the transmitter sends $1000$ packages periodically, every 50 milliseconds, starting with the maximum $l = 100$. After the first batch of messages has been sent, the transmitter waits $5$ seconds before sending the next batch of (smaller) packets.
 
-\paragraph{Receiver} The receiver is slightly less complicated as it's only role is to count the number of received packets and to periodically report this counter together with the current received payload length $l$ to a computer, using the serial connection. In our implementation, this happens every $2$ seconds.
+\paragraph{Receiver} The receiver is slightly less complicated as it's only role is to count the number of received messages and to periodically report this counter together with the current received payload length $l$ to a computer, using the serial connection. In our implementation, this happens every $2$ seconds.
 
-\paragraph{}With the information provided by the receiver, the Packet Reception Rate $PRR$ and Transmission Efficiency $\mathcal{E}$ are calculated using a \textsc{python} script. The results for the behavior of the channel where the distance between the motes was $35$ meters can be seen in figure \ref{fig:35mTest} and for the $45$ meters distance in figure \ref{fig:45mTest}. For the channel between the motes placed at $35$ meters, it can be seen that the maximum transmission efficiency $\mathcal{E}$ is reached when they packet length is about $80$ bytes. Even though the measurements for the channel where the distance between the motes was $45$ meters present a lot of variation, it is possible to see that the efficiency reaches a maximum at a lower packet size $l$ ($50-80$ bytes). This result is expected as a longer distance between the motes deteriorates the quality of the channel and increases the probability of bit error - therefore the probability of corrupting a larger packet.
+\paragraph{}With the information provided by the receiver, the Packet Reception Rate $PRR$ and transmission efficiency $\mathcal{E}$ are calculated using a \textsc{python} script. The results for the channel where the distance between the motes was $35$ meters can be seen in figure \ref{fig:35mTest} and for the $45$ meters distance in figure \ref{fig:45mTest}. For the channel between the motes placed at $35$ meters, it can be seen that the maximum transmission efficiency $\mathcal{E}$ is reached when they payload is about $80$ bytes. Even though the measurements for the channel where the distance between the motes was $45$ meters present a lot of variation, it is possible to see that the efficiency reaches a maximum at a lower packet size $l$ ($50-80$ bytes). This result is expected as the distance between the motes deteriorates the quality of the channel and increases the probability of bit error - therefore the probability of corrupting a larger packet.
 
-\paragraph{} The results presented show the relationship between distance and transmission efficiency of the channel. We use these results in order to verify that the DPLC scheme implemented performs as expected, choosing the a dynamic packet length that maximizes the capacity of the channel. The comparable results we obtained when using the DPLC scheme are presented in section \ref{sec:schemeTest}.
+\paragraph{} The results presented show the relationship between distance and transmission efficiency of the channel. We use these results in order to verify that the DPLC scheme implemented functions as expected, choosing the a dynamic packet length that maximizes the capacity of the channel. The comparable results we obtained when using the DPLC scheme are presented in section \ref{sec:schemeTest}.
 
 \begin{figure}
 \centering
 \includegraphics[scale=1]{figs/35mTest.pdf} 
-\caption{PRR and transmission efficiency, 35 meters apart\label{fig:35mTest}}
+\caption{\textit{PRR and transmission efficiency, 35 meters apart}\label{fig:35mTest}}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[scale=1]{figs/45mTest.pdf} 
-\caption{PRR and transmission efficiency, 45 meters apart\label{fig:45mTest}}
+\caption{\textit{PRR and transmission efficiency, 45 meters apart}\label{fig:45mTest}}
 \end{figure}
